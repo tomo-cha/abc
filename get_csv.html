@@ -84,7 +84,7 @@ function stopDeviceMotion(){
 // CSV格納用 ※ヘッダーをあらかじめ設定しておく
 const header = "\n";
 let accelData = header;
-function accelCsvDownload(accelData){
+function accelCsvDownload(){
   ////////////////////CSV形式へ変換////////////////////
   // BOMを付与（Excelで開いた際のの文字化け対策）
   const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
@@ -110,7 +110,7 @@ function accelCsvDownload(accelData){
 };
 
 let orientData = header;
-function orientCsvDownload(orientData){
+function orientCsvDownload(){
   ////////////////////CSV形式へ変換////////////////////
   // BOMを付与（Excelで開いた際のの文字化け対策）
   const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
