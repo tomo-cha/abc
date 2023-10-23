@@ -18,6 +18,10 @@
         <p> X: <span id="accelgravity-x">0</span> </p> 
         <p> Y: <span id="accelgravity-y">0</span> </p> 
         <p> Z: <span id="accelgravity-z">0</span> </p> 
+      <h2>Rotate</h2>
+        <p> X: <span id="rotate-alpha">0</span> </p> 
+        <p> Y: <span id="rotate-beta">0</span> </p> 
+        <p> Z: <span id="rotate-gamma">0</span> </p> 
 
   </body>
 
@@ -72,6 +76,10 @@ function handleAcceleration(ev){
     $('#accelgravity-x').text( ev.accelerationIncludingGravity.x );
     $('#accelgravity-y').text( ev.accelerationIncludingGravity.y );
     $('#accelgravity-z').text( ev.accelerationIncludingGravity.z );
+    //rotation
+    $('#rotate-alpha').text( ev.rotationRate.alpha );
+    $('#rotate-beta').text( ev.rotationRate.beta );
+    $('#rotate-gamma').text( ev.rotationRate.gamma );
 }
 
 </script>
