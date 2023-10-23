@@ -84,7 +84,7 @@ function stopDeviceMotion(){
 // CSV格納用 ※ヘッダーをあらかじめ設定しておく
 const header = "";
 let accelData = header;
-function accelCsvDownload(accelData){
+function accelCsvDownload(){
   ////////////////////CSV形式へ変換////////////////////
   // BOMを付与（Excelで開いた際のの文字化け対策）
   const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
@@ -110,7 +110,7 @@ function accelCsvDownload(accelData){
 };
 
 let orientData = header;
-function orientCsvDownload(orientData){
+function orientCsvDownload(){
   ////////////////////CSV形式へ変換////////////////////
   // BOMを付与（Excelで開いた際のの文字化け対策）
   const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
@@ -189,13 +189,13 @@ function handleAcceleration(ev){
     ////////////////////出力するデータの作成////////////////////
     // CSV格納用 ※ヘッダーをあらかじめ設定しておく
     accelData += e_time.getTime();
-    accelData += ",acc ,";
+    accelData += ",acc,";
     accelData += ev.acceleration.x;
     accelData += ",";
     accelData += ev.acceleration.y;
     accelData += ",";
     accelData += ev.acceleration.z;
-    accelData += "\r\n";
+    accelData += "\n";
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ function handleOrientation(ev){
     $('#ori-csv').append(e_time.getTime() + ", ori," + ev.absolute + "," + ev.alpha + "," + ev.beta + "," + ev.gamma + "\n");
 
     orientData += e_time.getTime();
-    orientData += ",ori ,";
+    orientData += ",ori,";
     orientData += ev.absolute;
     orientData += ",";
     orientData += ev.alpha;
@@ -220,7 +220,7 @@ function handleOrientation(ev){
     orientData += ev.beta;
     orientData += ",";
     orientData += ev.gamma;
-    orientData += "\r\n";
+    orientData += "\n";
 }
 
 </script>
