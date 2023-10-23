@@ -9,6 +9,7 @@
     <h1>Data from accelerometer</h1>
       <button onclick="requestMotionPermission();">Get permission and start sensing</button>
       <button onclick="stopDeviceMotion();">Stop</button>
+      <button onclick="accelCsvDownload()">CSVダウンロード</button>
 
       <h2>Acceleration</h2>
         <p> X: <span id="accel-x">0</span> </p> 
@@ -31,6 +32,7 @@
     <h1>Data from Magnetometer</h1>
         <button onclick="requestOrientationPermission();">Get permission and start sensing</button>
         <button onclick="stopDeviceOrientation();">Stop</button>
+        <button onclick="orientationCsvDownload()">CSVダウンロード</button>
 
       <p> Absolute: <span id="ori-abs">0</span> </p> 
       <p> Alpha: <span id="ori-a">0</span> </p> 
@@ -45,7 +47,7 @@
 
 <!--  ===========================================  -->
 <script type="text/javascript">
-alert("Welcome to sample page 4!");
+alert("Need to Allow location information!");
 
 //////////////////////////////////////////////////////
 //Function to get sensor access permission from the browser
@@ -77,6 +79,61 @@ function requestMotionPermission(){
 function stopDeviceMotion(){ 
     window.removeEventListener("devicemotion", handleAcceleration, false);
 }
+ 
+//参考: https://samehack.com/javascript-csv-download/
+// CSV格納用 ※ヘッダーをあらかじめ設定しておく
+const header = "\r\n";
+let accelData = header;
+function accelCsvDownload(accelData){
+  ////////////////////CSV形式へ変換////////////////////
+  // BOMを付与（Excelで開いた際のの文字化け対策）
+  const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+  // CSV用バイナリデータを作成
+  const blob = new Blob([bom, accelData], { type: "text/csv" });
+  // blobからオブジェクトURLを作成
+  const objectUrl = URL.createObjectURL(blob);
+
+  ////////////////////ダウンロードリンクの作成とクリック////////////////////
+  // ダウンロードリンクを作成 ※HTMLのaタグを作成
+  const downloadLink = document.createElement("a");
+  // ファイル名の設定
+  const fileName = "accelData.csv";
+  downloadLink.download = fileName;
+  // ダウンロードファイルを設定 ※aタグのhref属性
+  downloadLink.href = objectUrl;
+
+  // ダウンロードリンクを擬似的にクリック
+  downloadLink.click();
+
+  // ダウンロードリンクを削除
+  downloadLink.remove();
+};
+
+let orientData = header;
+function orientCsvDownload(orientData){
+  ////////////////////CSV形式へ変換////////////////////
+  // BOMを付与（Excelで開いた際のの文字化け対策）
+  const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+  // CSV用バイナリデータを作成
+  const blob = new Blob([bom, orientData], { type: "text/csv" });
+  // blobからオブジェクトURLを作成
+  const objectUrl = URL.createObjectURL(blob);
+
+  ////////////////////ダウンロードリンクの作成とクリック////////////////////
+  // ダウンロードリンクを作成 ※HTMLのaタグを作成
+  const downloadLink = document.createElement("a");
+  // ファイル名の設定
+  const fileName = "orientData.csv";
+  downloadLink.download = fileName;
+  // ダウンロードファイルを設定 ※aタグのhref属性
+  downloadLink.href = objectUrl;
+
+  // ダウンロードリンクを擬似的にクリック
+  downloadLink.click();
+
+  // ダウンロードリンクを削除
+  downloadLink.remove();
+};
 
 
 //////////////////////////////////////////////////////
@@ -119,9 +176,6 @@ function handleAcceleration(ev){
     $('#accel-y').text( ev.acceleration.y );
     $('#accel-z').text( ev.acceleration.z );
 
-    var e_time = new Date();
-    $('#acc-csv').append(e_time.getTime() + ",acc ," + ev.acceleration.x + "," + ev.acceleration.y + "," + ev.acceleration.z + "\n"); 
-
     $('#accel-g-x').text( ev.accelerationIncludingGravity.x );
     $('#accel-g-y').text( ev.accelerationIncludingGravity.y );
     $('#accel-g-z').text( ev.accelerationIncludingGravity.z );
@@ -129,6 +183,19 @@ function handleAcceleration(ev){
     $('#rotate-a').text( ev.rotationRate.alpha );
     $('#rotate-b').text( ev.rotationRate.beta );
     $('#rotate-g').text( ev.rotationRate.gamma );
+
+    var e_time = new Date();
+    $('#acc-csv').append(e_time.getTime() + ",acc ," + ev.acceleration.x + "," + ev.acceleration.y + "," + ev.acceleration.z + "\n"); 
+    ////////////////////出力するデータの作成////////////////////
+    // CSV格納用 ※ヘッダーをあらかじめ設定しておく
+    accelData += e_time.getTime();
+    accelData += ",acc ,";
+    accelData += ev.acceleration.x;
+    accelData += ",";
+    accelData += ev.acceleration.y;
+    accelData += ",";
+    accelData += ev.acceleration.z;
+    accelData += "\r\n";
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -143,6 +210,17 @@ function handleOrientation(ev){
 
     var e_time = new Date();
     $('#ori-csv').append(e_time.getTime() + ", ori," + ev.absolute + "," + ev.alpha + "," + ev.beta + "," + ev.gamma + "\n");
+
+    orientData += e_time.getTime();
+    orientData += ",ori ,";
+    orientData += ev.absolute;
+    orientData += ",";
+    orientData += ev.alpha;
+    orientData += ",";
+    orientData += ev.beta;
+    orientData += ",";
+    orientData += ev.gamma;
+    orientData += "\r\n";
 }
 
 </script>
