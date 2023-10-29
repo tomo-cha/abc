@@ -90,7 +90,8 @@ function stopDeviceMotion(){
  
 //参考: https://samehack.com/javascript-csv-download/
 // CSV格納用 ※ヘッダーをあらかじめ設定しておく
-const header = "time,label,accx,accy,accz\n";
+const header = "label,accx,accy,accz\n";
+// const header = "time,label,accx,accy,accz\n";
 let accelData = header;
 function accelCsvDownload(){
   ////////////////////CSV形式へ変換////////////////////
@@ -197,8 +198,8 @@ function handleAcceleration(ev){
     $('#acc-csv').append(e_time.getTime() + "," + label + "," + ev.acceleration.x + "," + ev.acceleration.y + "," + ev.acceleration.z + "\n"); 
     ////////////////////出力するデータの作成////////////////////
     // CSV格納用 ※ヘッダーをあらかじめ設定しておく
-    accelData += e_time.getTime();
-    accelData += ",";
+    // accelData += e_time.getTime();
+    // accelData += ",";
     accelData += label;
     accelData += ",";
     accelData += ev.acceleration.x;
@@ -222,8 +223,8 @@ function handleOrientation(ev){
     var e_time = new Date();
     $('#ori-csv').append(e_time.getTime() + "," + label + "," + ev.absolute + "," + ev.alpha + "," + ev.beta + "," + ev.gamma + "\n");
 
-    orientData += e_time.getTime();
-    accelData += ",";
+    // orientData += e_time.getTime();
+    // accelData += ",";
     accelData += label;
     accelData += ",";
     orientData += ev.absolute;
