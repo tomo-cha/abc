@@ -10,6 +10,14 @@
       <button onclick="requestMotionPermission();">Get permission and start sensing</button>
       <button onclick="stopDeviceMotion();">Stop</button>
       <button onclick="accelCsvDownload()">CSVダウンロード</button>
+      <br>
+      <br>
+      <br>
+      <button onclick="standing()">standing</button>
+      <button onclick="walking()">walking</button>
+      <button onclick="dancing()">dancing</button>
+      <button onclick="upstairs()">upstairs</button>
+      <button onclick="havingBag()">havingBag</button>
 
       <h2>Acceleration</h2>
         <p> X: <span id="accel-x">0</span> </p> 
@@ -82,7 +90,7 @@ function stopDeviceMotion(){
  
 //参考: https://samehack.com/javascript-csv-download/
 // CSV格納用 ※ヘッダーをあらかじめ設定しておく
-const header = "\n";
+const header = "time,label,accx,accy,accz\n";
 let accelData = header;
 function accelCsvDownload(){
   ////////////////////CSV形式へ変換////////////////////
@@ -170,6 +178,7 @@ function stopDeviceOrientation(){
 //Function(1): to handle acceleration data
 //  - This function will be called about 10-50 times per second
 ////////////////////////////////////////////////////////////////////
+let label = "stand";
 function handleAcceleration(ev){
     //alert("" + event.acceleration.x + " " + event.acceleration.y + " " + event.acceleration.z);
     $('#accel-x').text( ev.acceleration.x );
@@ -185,11 +194,13 @@ function handleAcceleration(ev){
     $('#rotate-g').text( ev.rotationRate.gamma );
 
     var e_time = new Date();
-    $('#acc-csv').append(e_time.getTime() + ",acc ," + ev.acceleration.x + "," + ev.acceleration.y + "," + ev.acceleration.z + "\n"); 
+    $('#acc-csv').append(e_time.getTime() + "," + label + "," + ev.acceleration.x + "," + ev.acceleration.y + "," + ev.acceleration.z + "\n"); 
     ////////////////////出力するデータの作成////////////////////
     // CSV格納用 ※ヘッダーをあらかじめ設定しておく
     accelData += e_time.getTime();
-    accelData += ",acc,";
+    accelData += ",";
+    accelData += label;
+    accelData += ",";
     accelData += ev.acceleration.x;
     accelData += ",";
     accelData += ev.acceleration.y;
@@ -209,10 +220,12 @@ function handleOrientation(ev){
     $('#ori-g').text( ev.gamma );
 
     var e_time = new Date();
-    $('#ori-csv').append(e_time.getTime() + ", ori," + ev.absolute + "," + ev.alpha + "," + ev.beta + "," + ev.gamma + "\n");
+    $('#ori-csv').append(e_time.getTime() + "," + label + "," + ev.absolute + "," + ev.alpha + "," + ev.beta + "," + ev.gamma + "\n");
 
     orientData += e_time.getTime();
-    orientData += ",ori,";
+    accelData += ",";
+    accelData += label;
+    accelData += ",";
     orientData += ev.absolute;
     orientData += ",";
     orientData += ev.alpha;
@@ -223,6 +236,21 @@ function handleOrientation(ev){
     orientData += "\n";
 }
 
+function standing(){
+  label = "stand";
+}
+function walking(){
+  label = "walk";
+}
+function dancing(){
+  label = "dance";
+}
+function upstairs(){
+  label = "upstairs";
+}
+function havingBag(){
+  label = "havingBag";
+}
 </script>
 <!--  ===========================================  -->
 
