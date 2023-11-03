@@ -8,15 +8,15 @@
 
   <body>
     <h1>Data from accelerometer</h1>
-    <div id="elapsedTime">経過時間(秒): <span>0</span></div>
+    <div>経過時間(ミリ秒): <span id="elapsedTime">0</span></div>
     <button onclick="requestMotionPermission();">
       Get permission and start sensing
     </button>
     <button onclick="stopDeviceMotion();">Stop</button>
     <button onclick="accelCsvDownload()">CSVダウンロード</button>
-    <br />
-    <br />
-    <br />
+    <br>
+    <br>
+    <br>
     <button onclick="standing()">standing</button>
     <button onclick="walking()">walking</button>
     <button onclick="dancing()">dancing</button>
@@ -67,7 +67,7 @@
     //Function to get sensor access permission from the browser
     //////////////////////////////////////////////////////
     //global変数宣言
-    let elapsed_time;
+    let elapsed_time=0;
 
     function requestMotionPermission() {
       if (
@@ -80,12 +80,12 @@
           .then((permissionState) => {
             if (permissionState === "granted") {
               // 許可を得られた場合、devicemotionをイベントリスナーに追加
+              elapsed_time = 0;
               window.addEventListener(
                 "devicemotion",
                 handleAcceleration,
                 false
               );
-              elapsed_time = 0;
             } else {
               // 許可を得られなかった場合の処理
               console.log("Perrmission not granted!");
@@ -247,7 +247,7 @@
       // 経過時間を計算
       var end_time = new Date();
       elapsed_time = elapsed_time + end_time - start_time; // ミリ秒単位の経過時間
-      $("#elapsedTime").text(elapsed_time / 1000);
+      $("#elapsedTime").text(elapsed_time);
       if(elapsed_time > 60000){
         stopDeviceMotion();
       }
