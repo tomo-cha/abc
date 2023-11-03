@@ -1,259 +1,314 @@
 <html>
-
   <head>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"
+    ></script>
   </head>
 
   <body>
-
     <h1>Data from accelerometer</h1>
-      <button onclick="requestMotionPermission();">Get permission and start sensing</button>
-      <button onclick="stopDeviceMotion();">Stop</button>
-      <button onclick="accelCsvDownload()">CSVダウンロード</button>
-      <br>
-      <br>
-      <br>
-      <button onclick="standing()">standing</button>
-      <button onclick="walking()">walking</button>
-      <button onclick="dancing()">dancing</button>
-      <button onclick="upstairs()">upstairs</button>
-      <button onclick="havingBag()">havingBag</button>
+    <div id="elapsedTime">経過時間(秒): <span>0</span></div>
+    <button onclick="requestMotionPermission();">
+      Get permission and start sensing
+    </button>
+    <button onclick="stopDeviceMotion();">Stop</button>
+    <button onclick="accelCsvDownload()">CSVダウンロード</button>
+    <br />
+    <br />
+    <br />
+    <button onclick="standing()">standing</button>
+    <button onclick="walking()">walking</button>
+    <button onclick="dancing()">dancing</button>
+    <button onclick="upstairs()">upstairs</button>
+    <button onclick="havingBag()">havingBag</button>
 
-      <h2>Acceleration</h2>
-        <p> X: <span id="accel-x">0</span> </p> 
-        <p> Y: <span id="accel-y">0</span> </p> 
-        <p> Z: <span id="accel-z">0</span> </p> 
+    <h2>Acceleration</h2>
+    <p>X: <span id="accel-x">0</span></p>
+    <p>Y: <span id="accel-y">0</span></p>
+    <p>Z: <span id="accel-z">0</span></p>
 
-      <h2>Acceleration (including gravity)</h2>
-        <p> X: <span id="accel-g-x">0</span> </p> 
-        <p> Y: <span id="accel-g-y">0</span> </p> 
-        <p> Z: <span id="accel-g-z">0</span> </p> 
+    <h2>Acceleration (including gravity)</h2>
+    <p>X: <span id="accel-g-x">0</span></p>
+    <p>Y: <span id="accel-g-y">0</span></p>
+    <p>Z: <span id="accel-g-z">0</span></p>
 
-      <h2>Rotation rate</h2>
-        <p> Alpha: <span id="rotate-a">0</span> </p> 
-        <p> Beta: <span id="rotate-b">0</span> </p> 
-        <p> Gamma: <span id="rotate-g">0</span> </p> 
+    <h2>Rotation rate</h2>
+    <p>Alpha: <span id="rotate-a">0</span></p>
+    <p>Beta: <span id="rotate-b">0</span></p>
+    <p>Gamma: <span id="rotate-g">0</span></p>
 
-      <h2>CSV data from Accelerometer</h2>
-	<textarea id="acc-csv" style="width:300px;height:300px;"></textarea>
-	
+    <h2>CSV data from Accelerometer</h2>
+    <textarea id="acc-csv" style="width: 300px; height: 300px"></textarea>
+
     <h1>Data from Magnetometer</h1>
-        <button onclick="requestOrientationPermission();">Get permission and start sensing</button>
-        <button onclick="stopDeviceOrientation();">Stop</button>
-        <button onclick="orientationCsvDownload()">CSVダウンロード</button>
+    <button onclick="requestOrientationPermission();">
+      Get permission and start sensing
+    </button>
+    <button onclick="stopDeviceOrientation();">Stop</button>
+    <button onclick="orientationCsvDownload()">CSVダウンロード</button>
 
-      <p> Absolute: <span id="ori-abs">0</span> </p> 
-      <p> Alpha: <span id="ori-a">0</span> </p> 
-      <p> Beta: <span id="ori-b">0</span> </p> 
-      <p> Gamma: <span id="ori-g">0</span> </p> 
+    <p>Absolute: <span id="ori-abs">0</span></p>
+    <p>Alpha: <span id="ori-a">0</span></p>
+    <p>Beta: <span id="ori-b">0</span></p>
+    <p>Gamma: <span id="ori-g">0</span></p>
 
-      <h2>CSV data from Magnetometer</h2>
-	<textarea id="ori-csv" style="width:300px;height:300px;"></textarea>	
+    <h2>CSV data from Magnetometer</h2>
+    <textarea id="ori-csv" style="width: 300px; height: 300px"></textarea>
 
     <h1><a href="./index.html">go back</a></h1>
   </body>
 
-<!--  ===========================================  -->
-<script type="text/javascript">
-alert("Need to Allow location information!");
+  <!--  ===========================================  -->
+  <script type="text/javascript">
+    alert("Need to Allow location information!");
 
-//////////////////////////////////////////////////////
-//Function to get sensor access permission from the browser
-//////////////////////////////////////////////////////
-function requestMotionPermission(){
-  if ( DeviceMotionEvent &&
-       typeof DeviceMotionEvent.requestPermission === 'function' ){
-      // iOS 13+ の Safari
-      // 許可を取得
-      DeviceMotionEvent.requestPermission().then(permissionState => {
-	  if (permissionState === 'granted') {
+    //////////////////////////////////////////////////////
+    //Function to get sensor access permission from the browser
+    //////////////////////////////////////////////////////
+    //global変数宣言
+    let elapsed_time;
+
+    function requestMotionPermission() {
+      if (
+        DeviceMotionEvent &&
+        typeof DeviceMotionEvent.requestPermission === "function"
+      ) {
+        // iOS 13+ の Safari
+        // 許可を取得
+        DeviceMotionEvent.requestPermission()
+          .then((permissionState) => {
+            if (permissionState === "granted") {
               // 許可を得られた場合、devicemotionをイベントリスナーに追加
-	      window.addEventListener("devicemotion", handleAcceleration, false);
-	  } else {
+              window.addEventListener(
+                "devicemotion",
+                handleAcceleration,
+                false
+              );
+              elapsed_time = 0;
+            } else {
               // 許可を得られなかった場合の処理
-	      console.log("Perrmission not granted!");
-	      alert("Perrmission not granted!");
-	  }
-      }).catch(console.error) // https通信でない場合などで許可を取得できなかった場合
+              console.log("Perrmission not granted!");
+              alert("Perrmission not granted!");
+            }
+          })
+          .catch(console.error); // https通信でない場合などで許可を取得できなかった場合
+      } else {
+        //For other devices
+        console.log("detected other device. so adding listener...");
+        window.addEventListener("devicemotion", handleAcceleration, false);
+      }
+    }
 
-  } else {
-      //For other devices
-      console.log("detected other device. so adding listener...");
-      window.addEventListener("devicemotion", handleAcceleration, false);
-  }
+    function stopDeviceMotion() {
+      window.removeEventListener("devicemotion", handleAcceleration, false);
+    }
 
-}
-
-function stopDeviceMotion(){ 
-    window.removeEventListener("devicemotion", handleAcceleration, false);
-}
- 
-//参考: https://samehack.com/javascript-csv-download/
-// CSV格納用 ※ヘッダーをあらかじめ設定しておく
-const header = "label,accx,accy,accz\n";
-// const header = "time,label,accx,accy,accz\n";
-let accelData = header;
-function accelCsvDownload(){
-  ////////////////////CSV形式へ変換////////////////////
-  // BOMを付与（Excelで開いた際のの文字化け対策）
-  const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-  // CSV用バイナリデータを作成
-  const blob = new Blob([bom, accelData], { type: "text/csv" });
-  // blobからオブジェクトURLを作成
-  const objectUrl = URL.createObjectURL(blob);
-
-  ////////////////////ダウンロードリンクの作成とクリック////////////////////
-  // ダウンロードリンクを作成 ※HTMLのaタグを作成
-  const downloadLink = document.createElement("a");
-  // ファイル名の設定
-  const fileName = "accelData.csv";
-  downloadLink.download = fileName;
-  // ダウンロードファイルを設定 ※aタグのhref属性
-  downloadLink.href = objectUrl;
-
-  // ダウンロードリンクを擬似的にクリック
-  downloadLink.click();
-
-  // ダウンロードリンクを削除
-  downloadLink.remove();
-};
-
-let orientData = header;
-function orientCsvDownload(){
-  ////////////////////CSV形式へ変換////////////////////
-  // BOMを付与（Excelで開いた際のの文字化け対策）
-  const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-  // CSV用バイナリデータを作成
-  const blob = new Blob([bom, orientData], { type: "text/csv" });
-  // blobからオブジェクトURLを作成
-  const objectUrl = URL.createObjectURL(blob);
-
-  ////////////////////ダウンロードリンクの作成とクリック////////////////////
-  // ダウンロードリンクを作成 ※HTMLのaタグを作成
-  const downloadLink = document.createElement("a");
-  // ファイル名の設定
-  const fileName = "orientData.csv";
-  downloadLink.download = fileName;
-  // ダウンロードファイルを設定 ※aタグのhref属性
-  downloadLink.href = objectUrl;
-
-  // ダウンロードリンクを擬似的にクリック
-  downloadLink.click();
-
-  // ダウンロードリンクを削除
-  downloadLink.remove();
-};
-
-
-//////////////////////////////////////////////////////
-//Function to get sensor access permission from the browser
-//////////////////////////////////////////////////////
-function requestOrientationPermission(){
-  if ( DeviceOrientationEvent &&
-       typeof DeviceOrientationEvent.requestPermission === 'function' ) {
-      // iOS 13+ の Safari
-      // 許可を取得
-      DeviceOrientationEvent.requestPermission().then(permissionState => {
-	  if (permissionState === 'granted') {
-              // 許可を得られた場合、deviceorientationをイベントリスナーに追加
-	      window.addEventListener("deviceorientation", handleOrientation, true);
-	  } else {
-              // 許可を得られなかった場合の処理
-	      console.log("Perrmission not granted!");
-	      alert("Perrmission not granted!");
-	  }
-      })
-	  .catch(console.error) // https通信でない場合などで許可を取得できなかった場
-  } else {
-    console.log("detected other device. so adding listener...");
-    window.addEventListener("deviceorientation", handleOrientation, true);
-  }
-}
-
-function stopDeviceOrientation(){ 
-    window.removeEventListener("deviceorientation", handleOrientation, true);
-}
-
-
-////////////////////////////////////////////////////////////////////
-//Function(1): to handle acceleration data
-//  - This function will be called about 10-50 times per second
-////////////////////////////////////////////////////////////////////
-let label = "stand";
-function handleAcceleration(ev){
-    //alert("" + event.acceleration.x + " " + event.acceleration.y + " " + event.acceleration.z);
-    $('#accel-x').text( ev.acceleration.x );
-    $('#accel-y').text( ev.acceleration.y );
-    $('#accel-z').text( ev.acceleration.z );
-
-    $('#accel-g-x').text( ev.accelerationIncludingGravity.x );
-    $('#accel-g-y').text( ev.accelerationIncludingGravity.y );
-    $('#accel-g-z').text( ev.accelerationIncludingGravity.z );
-
-    $('#rotate-a').text( ev.rotationRate.alpha );
-    $('#rotate-b').text( ev.rotationRate.beta );
-    $('#rotate-g').text( ev.rotationRate.gamma );
-
-    var e_time = new Date();
-    $('#acc-csv').append(e_time.getTime() + "," + label + "," + ev.acceleration.x + "," + ev.acceleration.y + "," + ev.acceleration.z + "\n"); 
-    ////////////////////出力するデータの作成////////////////////
+    //参考: https://samehack.com/javascript-csv-download/
     // CSV格納用 ※ヘッダーをあらかじめ設定しておく
-    // accelData += e_time.getTime();
-    // accelData += ",";
-    accelData += label;
-    accelData += ",";
-    accelData += ev.acceleration.x;
-    accelData += ",";
-    accelData += ev.acceleration.y;
-    accelData += ",";
-    accelData += ev.acceleration.z;
-    accelData += "\n";
-}
+    const header = "label,accx,accy,accz\n";
+    // const header = "time,label,accx,accy,accz\n";
+    let accelData = header;
+    function accelCsvDownload() {
+      ////////////////////CSV形式へ変換////////////////////
+      // BOMを付与（Excelで開いた際のの文字化け対策）
+      const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+      // CSV用バイナリデータを作成
+      const blob = new Blob([bom, accelData], { type: "text/csv" });
+      // blobからオブジェクトURLを作成
+      const objectUrl = URL.createObjectURL(blob);
 
-////////////////////////////////////////////////////////////////////
-//Function(2): to handle magnetometer data
-//  - This function will be called about 10-50 times per second
-////////////////////////////////////////////////////////////////////
-function handleOrientation(ev){
-    $('#ori-abs').text( ev.absolute );
-    $('#ori-a').text( ev.alpha );
-    $('#ori-b').text( ev.beta );
-    $('#ori-g').text( ev.gamma );
+      ////////////////////ダウンロードリンクの作成とクリック////////////////////
+      // ダウンロードリンクを作成 ※HTMLのaタグを作成
+      const downloadLink = document.createElement("a");
+      // ファイル名の設定
+      const fileName = "accelData.csv";
+      downloadLink.download = fileName;
+      // ダウンロードファイルを設定 ※aタグのhref属性
+      downloadLink.href = objectUrl;
 
-    var e_time = new Date();
-    $('#ori-csv').append(e_time.getTime() + "," + label + "," + ev.absolute + "," + ev.alpha + "," + ev.beta + "," + ev.gamma + "\n");
+      // ダウンロードリンクを擬似的にクリック
+      downloadLink.click();
 
-    // orientData += e_time.getTime();
-    // accelData += ",";
-    accelData += label;
-    accelData += ",";
-    orientData += ev.absolute;
-    orientData += ",";
-    orientData += ev.alpha;
-    orientData += ",";
-    orientData += ev.beta;
-    orientData += ",";
-    orientData += ev.gamma;
-    orientData += "\n";
-}
+      // ダウンロードリンクを削除
+      downloadLink.remove();
+    }
 
-function standing(){
-  label = "stand";
-}
-function walking(){
-  label = "walk";
-}
-function dancing(){
-  label = "dance";
-}
-function upstairs(){
-  label = "upstairs";
-}
-function havingBag(){
-  label = "havingBag";
-}
-</script>
-<!--  ===========================================  -->
+    let orientData = header;
+    function orientCsvDownload() {
+      ////////////////////CSV形式へ変換////////////////////
+      // BOMを付与（Excelで開いた際のの文字化け対策）
+      const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+      // CSV用バイナリデータを作成
+      const blob = new Blob([bom, orientData], { type: "text/csv" });
+      // blobからオブジェクトURLを作成
+      const objectUrl = URL.createObjectURL(blob);
 
+      ////////////////////ダウンロードリンクの作成とクリック////////////////////
+      // ダウンロードリンクを作成 ※HTMLのaタグを作成
+      const downloadLink = document.createElement("a");
+      // ファイル名の設定
+      const fileName = "orientData.csv";
+      downloadLink.download = fileName;
+      // ダウンロードファイルを設定 ※aタグのhref属性
+      downloadLink.href = objectUrl;
+
+      // ダウンロードリンクを擬似的にクリック
+      downloadLink.click();
+
+      // ダウンロードリンクを削除
+      downloadLink.remove();
+    }
+
+    //////////////////////////////////////////////////////
+    //Function to get sensor access permission from the browser
+    //////////////////////////////////////////////////////
+    function requestOrientationPermission() {
+      if (
+        DeviceOrientationEvent &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+      ) {
+        // iOS 13+ の Safari
+        // 許可を取得
+        DeviceOrientationEvent.requestPermission()
+          .then((permissionState) => {
+            if (permissionState === "granted") {
+              // 許可を得られた場合、deviceorientationをイベントリスナーに追加
+              window.addEventListener(
+                "deviceorientation",
+                handleOrientation,
+                true
+              );
+            } else {
+              // 許可を得られなかった場合の処理
+              console.log("Perrmission not granted!");
+              alert("Perrmission not granted!");
+            }
+          })
+          .catch(console.error); // https通信でない場合などで許可を取得できなかった場
+      } else {
+        console.log("detected other device. so adding listener...");
+        window.addEventListener("deviceorientation", handleOrientation, true);
+      }
+    }
+
+    function stopDeviceOrientation() {
+      window.removeEventListener("deviceorientation", handleOrientation, true);
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    //Function(1): to handle acceleration data
+    //  - This function will be called about 10-50 times per second
+    ////////////////////////////////////////////////////////////////////
+    let label = "stand";
+    function handleAcceleration(ev) {
+      // 現在の時刻を取得
+      var start_time = new Date();
+
+      //alert("" + event.acceleration.x + " " + event.acceleration.y + " " + event.acceleration.z);
+      $("#accel-x").text(ev.acceleration.x);
+      $("#accel-y").text(ev.acceleration.y);
+      $("#accel-z").text(ev.acceleration.z);
+
+      $("#accel-g-x").text(ev.accelerationIncludingGravity.x);
+      $("#accel-g-y").text(ev.accelerationIncludingGravity.y);
+      $("#accel-g-z").text(ev.accelerationIncludingGravity.z);
+
+      $("#rotate-a").text(ev.rotationRate.alpha);
+      $("#rotate-b").text(ev.rotationRate.beta);
+      $("#rotate-g").text(ev.rotationRate.gamma);
+
+      var e_time = new Date();
+      $("#acc-csv").append(
+        e_time.getTime() +
+          "," +
+          label +
+          "," +
+          ev.acceleration.x +
+          "," +
+          ev.acceleration.y +
+          "," +
+          ev.acceleration.z +
+          "\n"
+      );
+      ////////////////////出力するデータの作成////////////////////
+      // CSV格納用 ※ヘッダーをあらかじめ設定しておく
+      // accelData += e_time.getTime();
+      // accelData += ",";
+      accelData += label;
+      accelData += ",";
+      accelData += ev.acceleration.x;
+      accelData += ",";
+      accelData += ev.acceleration.y;
+      accelData += ",";
+      accelData += ev.acceleration.z;
+      accelData += "\n";
+
+      // 経過時間を計算
+      var end_time = new Date();
+      elapsed_time = elapsed_time + end_time - start_time; // ミリ秒単位の経過時間
+      $("#elapsedTime").text(elapsed_time / 1000);
+      if(elapsed_time > 60000){
+        stopDeviceMotion();
+      }
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    //Function(2): to handle magnetometer data
+    //  - This function will be called about 10-50 times per second
+    ////////////////////////////////////////////////////////////////////
+    function handleOrientation(ev) {
+      $("#ori-abs").text(ev.absolute);
+      $("#ori-a").text(ev.alpha);
+      $("#ori-b").text(ev.beta);
+      $("#ori-g").text(ev.gamma);
+
+      var e_time = new Date();
+      $("#ori-csv").append(
+        e_time.getTime() +
+          "," +
+          label +
+          "," +
+          ev.absolute +
+          "," +
+          ev.alpha +
+          "," +
+          ev.beta +
+          "," +
+          ev.gamma +
+          "\n"
+      );
+
+      // orientData += e_time.getTime();
+      // accelData += ",";
+      accelData += label;
+      accelData += ",";
+      orientData += ev.absolute;
+      orientData += ",";
+      orientData += ev.alpha;
+      orientData += ",";
+      orientData += ev.beta;
+      orientData += ",";
+      orientData += ev.gamma;
+      orientData += "\n";
+    }
+
+    function standing() {
+      label = "stand";
+    }
+    function walking() {
+      label = "walk";
+    }
+    function dancing() {
+      label = "dance";
+    }
+    function upstairs() {
+      label = "upstairs";
+    }
+    function havingBag() {
+      label = "havingBag";
+    }
+  </script>
+  <!--  ===========================================  -->
 
 </html>
