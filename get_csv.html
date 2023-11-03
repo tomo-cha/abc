@@ -75,9 +75,10 @@
     let accelData = header;
     let orientData = header;
     let label = "stand";
+    var startTime;
 
     function countTime(){
-        var startTime = new Date();
+        startTime = new Date();
         setTimeout(updateElapsedTime, 100); // 100ミリ秒後に再度updateElapsedTimeを呼び出す
     }
     function updateElapsedTime() {
