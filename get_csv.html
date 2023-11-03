@@ -8,7 +8,7 @@
 
   <body>
     <h1>Data from accelerometer</h1>
-    <div>経過時間(ミリ秒): <span id="elapsedTime">0</span></div>
+    <div>経過時間(ミリ秒): <span id="elapsed-time">0</span></div>
     <button onclick="requestMotionPermission();">
       Get permission and start sensing
     </button>
@@ -67,7 +67,11 @@
     //Function to get sensor access permission from the browser
     //////////////////////////////////////////////////////
     //global変数宣言
-    let elapsed_time=0;
+    var elapsed_time=0;
+    const header = "label,accx,accy,accz\n";
+    let accelData = header;
+    let orientData = header;
+    let label = "stand";
 
     function requestMotionPermission() {
       if (
@@ -106,9 +110,7 @@
 
     //参考: https://samehack.com/javascript-csv-download/
     // CSV格納用 ※ヘッダーをあらかじめ設定しておく
-    const header = "label,accx,accy,accz\n";
     // const header = "time,label,accx,accy,accz\n";
-    let accelData = header;
     function accelCsvDownload() {
       ////////////////////CSV形式へ変換////////////////////
       // BOMを付与（Excelで開いた際のの文字化け対策）
@@ -134,7 +136,6 @@
       downloadLink.remove();
     }
 
-    let orientData = header;
     function orientCsvDownload() {
       ////////////////////CSV形式へ変換////////////////////
       // BOMを付与（Excelで開いた際のの文字化け対策）
@@ -200,7 +201,7 @@
     //Function(1): to handle acceleration data
     //  - This function will be called about 10-50 times per second
     ////////////////////////////////////////////////////////////////////
-    let label = "stand";
+    
     function handleAcceleration(ev) {
       // 現在の時刻を取得
       var start_time = new Date();
@@ -247,7 +248,7 @@
       // 経過時間を計算
       var end_time = new Date();
       elapsed_time = elapsed_time + end_time - start_time; // ミリ秒単位の経過時間
-      $("#elapsedTime").text(elapsed_time);
+      $("#elapsed-time").text(elapsed_time);
       if(elapsed_time > 60000){
         stopDeviceMotion();
       }
