@@ -8,10 +8,7 @@
 
   <body>
     <h1>Data from accelerometer</h1>
-    <div id="elapsedTime"></div>
-    <button onclick="countTime();">
-      count time
-    </button>
+    <div id="elapsedTime">経過時間（秒）: 0</div>
     <button onclick="requestMotionPermission();">
       Get permission and start sensing
     </button>
@@ -77,19 +74,6 @@
     let label = "stand";
     var startTime;
 
-    function countTime(){
-        startTime = new Date();
-      updateElapsedTime(); // カウント開始
-    }
-    function updateElapsedTime() {
-        var currentTime = new Date();
-        var elapsedTime = currentTime - startTime; // 経過時間（ミリ秒）
-        $("#elapsedTime").text("経過時間（ミリ秒）: " + elapsedTime);
-        if(elapsedTime < 10000){
-          setTimeout(updateElapsedTime, 100); // 100ミリ秒後に再度updateElapsedTimeを呼び出す
-        }
-    }
-
     function requestMotionPermission() {
       if (
         DeviceMotionEvent &&
@@ -101,7 +85,7 @@
           .then((permissionState) => {
             if (permissionState === "granted") {
               // 許可を得られた場合、devicemotionをイベントリスナーに追加
-              elapsed_time = 0;
+              startTime = new Date();
               window.addEventListener(
                 "devicemotion",
                 handleAcceleration,
@@ -262,12 +246,11 @@
       accelData += ev.acceleration.z;
       accelData += "\n";
 
-      // 経過時間を計算
-      var end_time = new Date();
-      elapsed_time = elapsed_time + end_time - start_time; // ミリ秒単位の経過時間
-      $("#elapsed-time").text(elapsed_time);
-      if(elapsed_time > 60000){
-        stopDeviceMotion();
+      var currentTime = new Date();
+      var elapsedTime = currentTime - startTime; // 経過時間（ミリ秒）
+      $("#elapsedTime").text("経過時間（秒）: " + elapsedTime/1000);
+      if(elapsedTime < 60000){
+        setTimeout(updateElapsedTime, 100); // 100ミリ秒後に再度updateElapsedTimeを呼び出す
       }
     }
 
